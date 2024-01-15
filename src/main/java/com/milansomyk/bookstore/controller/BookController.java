@@ -2,6 +2,7 @@ package com.milansomyk.bookstore.controller;
 
 import com.milansomyk.bookstore.dto.BookDto;
 import com.milansomyk.bookstore.dto.ResponseContainer;
+import com.milansomyk.bookstore.service.AuthService;
 import com.milansomyk.bookstore.service.BookService;
 import jakarta.validation.Valid;
 import lombok.Data;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/books")
 public class BookController {
     private final BookService bookService;
+    private final AuthService authService;
     @PostMapping
     public ResponseEntity<ResponseContainer> create(@RequestBody @Valid BookDto bookDto){
         ResponseContainer responseContainer = bookService.create(bookDto);
@@ -25,8 +27,9 @@ public class BookController {
         return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
     }
     @GetMapping(value = "/{id}")
-    public ResponseEntity<ResponseContainer> findById(@PathVariable int id){
-        ResponseContainer responseContainer = bookService.findById(id);
+    public ResponseEntity<ResponseContainer> findById(@PathVariable int id, @RequestHeader("AUTHORIZATION") String token){
+        String username = authService.extractUsernameFromAuth(token);
+        ResponseContainer responseContainer = bookService.findById(id, username);
         return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
     }
     @PutMapping(value = "/{id}")

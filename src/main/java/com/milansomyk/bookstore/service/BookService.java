@@ -5,8 +5,11 @@ import com.milansomyk.bookstore.dto.BookDto;
 import com.milansomyk.bookstore.dto.BookQLDto;
 import com.milansomyk.bookstore.dto.ResponseContainer;
 import com.milansomyk.bookstore.entity.Book;
+import com.milansomyk.bookstore.entity.User;
+import com.milansomyk.bookstore.enums.LogType;
 import com.milansomyk.bookstore.mapper.BookMapper;
 import com.milansomyk.bookstore.repository.BookRepository;
+import com.milansomyk.bookstore.repository.UserRepository;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,8 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final ReviewsAndCommentsService reviewsAndCommentsService;
+    private final ActivityLogService activityLogService;
+    private final UserRepository userRepository;
 
     public ResponseContainer create(BookDto bookDto) {
         ResponseContainer responseContainer = new ResponseContainer();
@@ -58,7 +63,7 @@ public class BookService {
         List<BookDto> list = bookList.stream().map(bookMapper::toDto).toList();
         return responseContainer.setSuccessResult(list);
     }
-    public ResponseContainer findById(int id){
+    public ResponseContainer findById(int id, String username){
         ResponseContainer responseContainer = new ResponseContainer();
         Book found;
         if(ObjectUtils.isEmpty(id)){
@@ -74,6 +79,24 @@ public class BookService {
         if(ObjectUtils.isEmpty(found)){
             log.error("book not found");
             return responseContainer.setErrorMessageAndStatusCode("book not found",HttpStatus.BAD_REQUEST.value());
+        }
+        if(StringUtils.hasText(username)){
+            User user;
+            try{
+                user = userRepository.findByUsername(username).orElse(null);
+            }catch (Exception e){
+                log.error(e.getMessage());
+                return responseContainer.setErrorMessageAndStatusCode(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR.value());
+            }
+            if(user==null){
+                log.error("user not found");
+                return responseContainer.setErrorMessageAndStatusCode("user not found", HttpStatus.BAD_REQUEST.value());
+            }
+            ResponseContainer logged = activityLogService.log(user.getUserId(), id, LogType.BOOK_VIEW);
+            if(logged.isError()){
+                log.error(logged.getErrorMessage());
+                return logged;
+            }
         }
         return responseContainer.setSuccessResult(bookMapper.toDto(found));
     }

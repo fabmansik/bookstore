@@ -5,6 +5,7 @@ import com.milansomyk.bookstore.dto.requests.RefreshRequest;
 import com.milansomyk.bookstore.dto.requests.SignInRequest;
 import com.milansomyk.bookstore.dto.responses.JwtResponse;
 import com.milansomyk.bookstore.entity.User;
+import com.milansomyk.bookstore.enums.LogType;
 import com.milansomyk.bookstore.mapper.UserMapper;
 import com.milansomyk.bookstore.repository.UserRepository;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class AuthService {
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final DbUserDetailsService dbUserDetailsService;
+    private final ActivityLogService activityLogService;
     @Autowired
     private final PasswordEncoder passwordEncoder;
     public ResponseContainer login (SignInRequest signInRequest){
@@ -74,6 +76,11 @@ public class AuthService {
         } catch (Exception e){
             log.error(e.getMessage());
             return responseContainer.setErrorMessageAndStatusCode(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        ResponseContainer logged = activityLogService.log(user.getUserId(), LogType.LOGINATION);
+        if (logged.isError()){
+            log.error(logged.getErrorMessage());
+            return logged;
         }
         return responseContainer.setSuccessResult(new JwtResponse(token, refresh));
     }

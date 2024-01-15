@@ -5,6 +5,7 @@ import com.milansomyk.bookstore.dto.CommentDto;
 import com.milansomyk.bookstore.dto.ResponseContainer;
 import com.milansomyk.bookstore.dto.ReviewDto;
 import com.milansomyk.bookstore.entity.User;
+import com.milansomyk.bookstore.enums.LogType;
 import com.milansomyk.bookstore.mapper.ReviewsAndCommentsMapper;
 import com.milansomyk.bookstore.repository.ReviewsAndCommentsRepository;
 import com.milansomyk.bookstore.repository.UserRepository;
@@ -24,6 +25,7 @@ public class ReviewsAndCommentsService {
     private final ReviewsAndCommentsRepository reviewsAndCommentsRepository;
     private final ReviewsAndCommentsMapper reviewsAndCommentsMapper;
     private final UserRepository userRepository;
+    private final ActivityLogService activityLogService;
     public ResponseContainer initCreate(int bookId){
         ReviewsAndComments reviewsAndComments = new ReviewsAndComments();
         reviewsAndComments.setBookId(bookId);
@@ -87,6 +89,11 @@ public class ReviewsAndCommentsService {
             log.error(e.getMessage());
             return responseContainer.setErrorMessageAndStatusCode(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+        ResponseContainer logged = activityLogService.log(found.getUserId(), bookId, LogType.COMMENT);
+        if (logged.isError()){
+            log.error(logged.getErrorMessage());
+            return logged;
+        }
         return responseContainer.setSuccessResult(reviewsAndCommentsMapper.toDto(saved));
     }
     public ResponseContainer addReview(int bookId, String username, String text, int rating){
@@ -141,6 +148,11 @@ public class ReviewsAndCommentsService {
         }catch (Exception e){
             log.error(e.getMessage());
             return responseContainer.setErrorMessageAndStatusCode(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        ResponseContainer logged = activityLogService.log(found.getUserId(), bookId, LogType.REVIEW);
+        if (logged.isError()){
+            log.error(logged.getErrorMessage());
+            return logged;
         }
         return responseContainer.setSuccessResult(reviewsAndCommentsMapper.toDto(saved));
     }

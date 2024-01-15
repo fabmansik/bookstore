@@ -8,5 +8,5 @@ import java.util.Date;
 public class LogDto {
     private Date timestamp;
     private String activityType;
-    private String Details;
+    private Object Details;
 }

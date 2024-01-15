@@ -4,6 +4,7 @@ import com.milansomyk.bookstore.dto.ResponseContainer;
 import com.milansomyk.bookstore.entity.Book;
 import com.milansomyk.bookstore.entity.Orders;
 import com.milansomyk.bookstore.entity.User;
+import com.milansomyk.bookstore.enums.LogType;
 import com.milansomyk.bookstore.mapper.OrdersMapper;
 import com.milansomyk.bookstore.repository.BookRepository;
 import com.milansomyk.bookstore.repository.OrdersRepository;
@@ -28,6 +29,7 @@ public class OrdersService {
     private final BookRepository bookRepository;
     private final OrdersRepository ordersRepository;
     private final OrdersMapper ordersMapper;
+    private final ActivityLogService activityLogService;
     public ResponseContainer createOrder(List<Integer> bookIds, String username){
         ResponseContainer responseContainer = new ResponseContainer();
         if(CollectionUtils.isEmpty(bookIds)){
@@ -73,11 +75,17 @@ public class OrdersService {
         for (Integer integer : list) summary = summary + integer;
         order.setOrderPrice(summary);
         Orders saved;
+
         try{
             saved = ordersRepository.save(order);
         } catch (Exception e){
             log.error(e.getMessage());
             return responseContainer.setErrorMessageAndStatusCode(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        ResponseContainer logged = activityLogService.log(found.getUserId(), bookList.stream().map(Book::getId).toList(), LogType.ORDER_CREATING);
+        if (logged.isError()){
+            log.error(logged.getErrorMessage());
+            return logged;
         }
         return responseContainer.setSuccessResult(ordersMapper.toDto(saved));
     }
