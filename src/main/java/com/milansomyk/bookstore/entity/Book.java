@@ -30,4 +30,11 @@ public class Book {
         this.price = price;
         this.publicationYear = publicationYear;
     }
+
+    public Book(String title, String author, int price, Year publicationYear) {
+        this.title = title;
+        this.author = author;
+        this.price = price;
+        this.publicationYear = publicationYear;
+    }
 }

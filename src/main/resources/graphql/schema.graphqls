@@ -1,0 +1,37 @@
+type Query {
+    books: [Book]
+    bookById(id: ID!): Book
+}
+
+type Mutation{
+    addBook(book: BookInput): Book
+    deleteBook(id:ID!): Int
+    updateBook(book: BookUpdate): Book
+}
+input BookInput{
+    title: String!
+    author: String!
+    price: Int!
+    publicationYear: Int!
+}
+input BookUpdate{
+    id: ID!
+    title:String
+    author: String
+    price: Int
+    publicationYear: Int
+}
+type Book{
+    id: ID!
+    title: String!
+    author: String!
+    price: Int!
+    publicationYear: Int!
+}
+
+type ResponseContainer {
+    result: [Book]
+    errorMessage: String
+    isError: Boolean
+    statusCode: Int
+}

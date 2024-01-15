@@ -7,18 +7,36 @@ import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @Data
-@RequestMapping(value = "/management")
+@RequestMapping("/api/books")
 public class BookController {
     private final BookService bookService;
-    @PostMapping(value = "/book")
+    @PostMapping
     public ResponseEntity<ResponseContainer> create(@RequestBody @Valid BookDto bookDto){
         ResponseContainer responseContainer = bookService.create(bookDto);
+        return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
+    }
+    @GetMapping
+    public ResponseEntity<ResponseContainer> getAll(){
+        ResponseContainer responseContainer = bookService.getAll();
+        return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
+    }
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ResponseContainer> findById(@PathVariable int id){
+        ResponseContainer responseContainer = bookService.findById(id);
+        return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
+    }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<ResponseContainer> updateById(@PathVariable int id, @RequestBody @Valid BookDto bookDto){
+        ResponseContainer responseContainer = bookService.updateById(id, bookDto);
+        return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
+    }
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<ResponseContainer> deleteById(@PathVariable int id){
+        ResponseContainer responseContainer = bookService.deleteById(id);
         return ResponseEntity.status(responseContainer.getStatusCode()).body(responseContainer);
     }
 }

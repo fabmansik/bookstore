@@ -1,4 +1,7 @@
 spring:
+  graphql:
+    graphiql:
+      enabled: true
   jpa:
     generate-ddl: true
     hibernate:
