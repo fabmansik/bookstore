@@ -61,35 +61,35 @@ URL:localhost:8080/refresh
     "refresh":"eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6IlJPTEVfVVNFUiIsInN1YiI6ImtpayIsImlhdCI6MTcwNTIzNDI0MiwiZXhwIjoxNzA1MjQxNDQyfQ.D9tvTRoqLazjsvnydtpCjMxnP9960DJOV5MibXsZqCM"
 }
 ```
-/api/books - REST API CRUD with books with @PathVariable and @RequestBody (no security)
+/api/books - REST API CRUD with books with @PathVariable and @RequestBody (no security) - BookController.java
 ```bash
 */example code:
 URL: localhost:8080/api/books/2
 
 ```
 
-/graphql - GraphQL API CRUD with books (no security)
+/graphql - GraphQL API CRUD with books (no security) - BookQLController.java
 ```bash
 */example code:
 URL: localhost:8080/graphql
 
 ```
 
-/order @RequestBody @RequestHeader (authenticated) - create order with ids of books
+/order @RequestBody @RequestHeader (authenticated) - create order with ids of books - OrdersController.java
 ```bash
 */example code:
 URL: localhost:8080/order
 
 [1,2]
 ```
-/comments @RequestHeader @RequestBody @RequestParam (bookId)
+/comments @RequestHeader @RequestBody @RequestParam (bookId) - ReviewsAndCommentsController.java
 ```bash
 */example code:
 URL: localhost:8080/comments?bookId=7
 
 "Book is good"
 ```
-/reviews @RequestHeader @RequestBody @RequestParam (bookId) @RequestParam (rating)
+/reviews @RequestHeader @RequestBody @RequestParam (bookId) @RequestParam (rating) - ReviewsAndCommentsController.java
 ```bash
 */example code:
 URL: localhost:8080/reviews?bookId=8&rating=8
