@@ -1,0 +1,17 @@
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/bookstore
+    username: root
+    password: root
+  data:
+    mongodb:
+      uri: mongodb+srv://root:root@cluster0.urvydqm.mongodb.net/?retryWrites=true&w=majority
+      database: bookstore
+
+jwt:
+  signingKey: super_secret_key_very_long_really_trust_me
+
